@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { unstable_noStore as noStore } from "next/cache";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 
@@ -204,11 +205,12 @@ export async function getSettings(): Promise<SiteSettings> {
   // Try Redis first (Vercel)
   const redis = getRedis();
   if (redis) {
+    noStore(); // Tell Next.js this is dynamic before the fetch
     try {
       const data = await redis.get<SiteSettings>(SETTINGS_KEY);
       if (data) return { ...defaultSettings, ...data };
-    } catch (e) {
-      console.error("Redis read error:", e);
+    } catch {
+      // Expected during build — silently fall back to defaults
     }
     return { ...defaultSettings };
   }
@@ -240,6 +242,7 @@ export async function saveSettings(settings: SiteSettings): Promise<void> {
   // Try Redis first (Vercel)
   const redis = getRedis();
   if (redis) {
+    noStore();
     await redis.set(SETTINGS_KEY, settings);
     return;
   }

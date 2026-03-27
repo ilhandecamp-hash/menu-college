@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { unstable_noStore as noStore } from "next/cache";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 
@@ -38,11 +39,12 @@ function getRedis(): Redis | null {
 export async function getAnalytics(): Promise<AnalyticsData> {
   const redis = getRedis();
   if (redis) {
+    noStore();
     try {
       const data = await redis.get<AnalyticsData>(ANALYTICS_KEY);
       if (data) return { ...defaultAnalytics, ...data };
-    } catch (e) {
-      console.error("Redis analytics read error:", e);
+    } catch {
+      // Expected during build — silently fall back to defaults
     }
     return { ...defaultAnalytics, pageViews: [] };
   }
@@ -62,6 +64,7 @@ export async function getAnalytics(): Promise<AnalyticsData> {
 export async function trackPageView(): Promise<void> {
   const redis = getRedis();
   if (redis) {
+    noStore();
     try {
       const data = await getAnalytics();
       const today = new Date().toISOString().split("T")[0];
@@ -81,8 +84,8 @@ export async function trackPageView(): Promise<void> {
       }
 
       await redis.set(ANALYTICS_KEY, data);
-    } catch (e) {
-      console.error("Redis analytics write error:", e);
+    } catch {
+      // Expected during build — silently ignore
     }
     return;
   }
