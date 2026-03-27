@@ -29,24 +29,20 @@ export async function generateMetadata(): Promise<Metadata> {
       title: settings.metaTitle,
       description: settings.metaDescription,
       siteName: settings.schoolName,
-      ...(settings.ogImageUrl
-        ? {
-            images: [
-              {
-                url: settings.ogImageUrl,
-                width: 1200,
-                height: 630,
-                alt: settings.metaTitle,
-              },
-            ],
-          }
-        : {}),
+      images: [
+        {
+          url: settings.ogImageUrl || `${siteUrl}/api/og`,
+          width: 1200,
+          height: 630,
+          alt: settings.metaTitle,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: settings.metaTitle,
       description: settings.metaDescription,
-      ...(settings.ogImageUrl ? { images: [settings.ogImageUrl] } : {}),
+      images: [settings.ogImageUrl || `${siteUrl}/api/og`],
     },
     robots: {
       index: true,
