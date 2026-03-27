@@ -4,7 +4,11 @@ import { getSettings, colorThemes } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = getSettings();
-  const siteUrl = settings.siteUrl || "https://menu-college.vercel.app";
+  const siteUrl =
+    settings.siteUrl ||
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "https://menu-college.vercel.app");
 
   return {
     title: settings.metaTitle,

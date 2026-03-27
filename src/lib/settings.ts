@@ -186,31 +186,45 @@ export const colorThemes: Record<string, ColorTheme> = {
 const SETTINGS_PATH = path.join(process.cwd(), "data", "settings.json");
 
 export function getSettings(): SiteSettings {
-  if (!existsSync(SETTINGS_PATH)) {
+  try {
+    if (!existsSync(SETTINGS_PATH)) {
+      // Try to create the default file (fails on read-only filesystems like Vercel)
+      try {
+        const dir = path.dirname(SETTINGS_PATH);
+        if (!existsSync(dir)) {
+          mkdirSync(dir, { recursive: true });
+        }
+        writeFileSync(
+          SETTINGS_PATH,
+          JSON.stringify(defaultSettings, null, 2),
+          "utf-8"
+        );
+      } catch {
+        // Read-only filesystem (Vercel), just return defaults
+      }
+      return { ...defaultSettings };
+    }
+
+    const raw = readFileSync(SETTINGS_PATH, "utf-8");
+    const parsed = JSON.parse(raw);
+    return {
+      ...defaultSettings,
+      ...parsed,
+    };
+  } catch {
+    return { ...defaultSettings };
+  }
+}
+
+export function saveSettings(settings: SiteSettings): void {
+  try {
     const dir = path.dirname(SETTINGS_PATH);
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
     }
-    writeFileSync(
-      SETTINGS_PATH,
-      JSON.stringify(defaultSettings, null, 2),
-      "utf-8"
-    );
-    return { ...defaultSettings };
+    writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2), "utf-8");
+  } catch (e) {
+    console.error("Cannot save settings (read-only filesystem?):", e);
+    throw new Error("Impossible de sauvegarder. Le système de fichiers est en lecture seule sur Vercel.");
   }
-
-  const raw = readFileSync(SETTINGS_PATH, "utf-8");
-  const parsed = JSON.parse(raw);
-  return {
-    ...defaultSettings,
-    ...parsed,
-  };
-}
-
-export function saveSettings(settings: SiteSettings): void {
-  const dir = path.dirname(SETTINGS_PATH);
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
-  }
-  writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2), "utf-8");
 }

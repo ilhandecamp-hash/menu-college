@@ -33,27 +33,31 @@ export function getAnalytics(): AnalyticsData {
 }
 
 export function trackPageView(): void {
-  const data = getAnalytics();
-  const today = new Date().toISOString().split("T")[0];
+  try {
+    const data = getAnalytics();
+    const today = new Date().toISOString().split("T")[0];
 
-  data.totalViews += 1;
-  data.lastVisit = new Date().toISOString();
+    data.totalViews += 1;
+    data.lastVisit = new Date().toISOString();
 
-  const existing = data.pageViews.find((pv) => pv.date === today);
-  if (existing) {
-    existing.count += 1;
-  } else {
-    data.pageViews.push({ date: today, count: 1 });
+    const existing = data.pageViews.find((pv) => pv.date === today);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      data.pageViews.push({ date: today, count: 1 });
+    }
+
+    // Keep only the last 90 days
+    if (data.pageViews.length > 90) {
+      data.pageViews = data.pageViews.slice(-90);
+    }
+
+    const dir = path.dirname(ANALYTICS_PATH);
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
+    writeFileSync(ANALYTICS_PATH, JSON.stringify(data, null, 2), "utf-8");
+  } catch {
+    // Read-only filesystem (Vercel) — silently ignore
   }
-
-  // Keep only the last 90 days
-  if (data.pageViews.length > 90) {
-    data.pageViews = data.pageViews.slice(-90);
-  }
-
-  const dir = path.dirname(ANALYTICS_PATH);
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
-  }
-  writeFileSync(ANALYTICS_PATH, JSON.stringify(data, null, 2), "utf-8");
 }
