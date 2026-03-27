@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { getSettings, colorThemes } from "@/lib/settings";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const siteUrl =
