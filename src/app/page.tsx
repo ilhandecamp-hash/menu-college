@@ -9,29 +9,9 @@ import ScrollReveal from "@/components/ScrollReveal";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import PageViewTracker from "@/components/PageViewTracker";
 import { getSettings } from "@/lib/settings";
+import { scrapeMenus, MenuItem } from "@/lib/scraper";
 
 export const dynamic = "force-dynamic";
-
-interface MenuItem {
-  title: string;
-  url: string;
-  filename: string;
-}
-
-interface MenuResponse {
-  menus: MenuItem[];
-  fetchedAt: string;
-  error?: string;
-}
-
-async function getMenus(): Promise<MenuResponse> {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
-
-  const res = await fetch(`${baseUrl}/api/menus`, { cache: "no-store" });
-  return res.json();
-}
 
 const MOIS: Record<string, number> = {
   janvier: 0, fevrier: 1, février: 1, mars: 2, avril: 3, mai: 4, juin: 5,
@@ -77,8 +57,12 @@ function sortMenusByCurrentWeek(menus: MenuItem[]): MenuItem[] {
 
 export default async function Home() {
   const settings = getSettings();
-  const data = await getMenus();
-  const menus = data.menus ?? [];
+  let menus: MenuItem[] = [];
+  try {
+    menus = await scrapeMenus();
+  } catch (e) {
+    console.error("Failed to scrape menus:", e);
+  }
   const sortedMenus = sortMenusByCurrentWeek(menus);
 
   return (
