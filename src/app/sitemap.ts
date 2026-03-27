@@ -1,8 +1,8 @@
 import { MetadataRoute } from "next";
 import { getSettings } from "@/lib/settings";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const settings = getSettings();
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const settings = await getSettings();
   const baseUrl = settings.siteUrl || "https://menu-college.vercel.app";
 
   return [

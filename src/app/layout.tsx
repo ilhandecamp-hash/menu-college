@@ -3,7 +3,7 @@ import "./globals.css";
 import { getSettings, colorThemes } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = getSettings();
+  const settings = await getSettings();
   const siteUrl =
     settings.siteUrl ||
     (process.env.VERCEL_URL
@@ -72,12 +72,12 @@ const darkModeScript = `
   })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const settings = getSettings();
+  const settings = await getSettings();
   const theme = colorThemes[settings.primaryColor] || colorThemes.warm;
 
   const cssVars = Object.entries(theme.vars)

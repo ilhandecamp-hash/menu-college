@@ -9,6 +9,6 @@ export async function GET() {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  const data = getAnalytics();
+  const data = await getAnalytics();
   return NextResponse.json(data);
 }

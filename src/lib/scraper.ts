@@ -8,7 +8,7 @@ export interface MenuItem {
 }
 
 export async function scrapeMenus(): Promise<MenuItem[]> {
-  const settings = getSettings();
+  const settings = await getSettings();
   const TARGET_URL = settings.sourceUrl;
   const BASE_URL = new URL("./", TARGET_URL).toString();
 

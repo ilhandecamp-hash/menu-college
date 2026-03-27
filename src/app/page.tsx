@@ -56,7 +56,7 @@ function sortMenusByCurrentWeek(menus: MenuItem[]): MenuItem[] {
 }
 
 export default async function Home() {
-  const settings = getSettings();
+  const settings = await getSettings();
   let menus: MenuItem[] = [];
   try {
     menus = await scrapeMenus();

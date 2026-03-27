@@ -1,3 +1,4 @@
+import { Redis } from "@upstash/redis";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 
@@ -181,50 +182,70 @@ export const colorThemes: Record<string, ColorTheme> = {
   },
 };
 
-// --- File I/O ---
+// --- Redis / File I/O ---
 
+const SETTINGS_KEY = "site-settings";
 const SETTINGS_PATH = path.join(process.cwd(), "data", "settings.json");
 
-export function getSettings(): SiteSettings {
+function getRedis(): Redis | null {
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    return null;
+  }
+  return new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+}
+
+export async function getSettings(): Promise<SiteSettings> {
+  // Try Redis first (Vercel)
+  const redis = getRedis();
+  if (redis) {
+    try {
+      const data = await redis.get<SiteSettings>(SETTINGS_KEY);
+      if (data) return { ...defaultSettings, ...data };
+    } catch (e) {
+      console.error("Redis read error:", e);
+    }
+    return { ...defaultSettings };
+  }
+
+  // Fallback: file system (local dev)
   try {
     if (!existsSync(SETTINGS_PATH)) {
-      // Try to create the default file (fails on read-only filesystems like Vercel)
       try {
         const dir = path.dirname(SETTINGS_PATH);
-        if (!existsSync(dir)) {
-          mkdirSync(dir, { recursive: true });
-        }
+        if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
         writeFileSync(
           SETTINGS_PATH,
           JSON.stringify(defaultSettings, null, 2),
           "utf-8"
         );
       } catch {
-        // Read-only filesystem (Vercel), just return defaults
+        // Read-only filesystem
       }
       return { ...defaultSettings };
     }
-
     const raw = readFileSync(SETTINGS_PATH, "utf-8");
-    const parsed = JSON.parse(raw);
-    return {
-      ...defaultSettings,
-      ...parsed,
-    };
+    return { ...defaultSettings, ...JSON.parse(raw) };
   } catch {
     return { ...defaultSettings };
   }
 }
 
-export function saveSettings(settings: SiteSettings): void {
-  try {
-    const dir = path.dirname(SETTINGS_PATH);
-    if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
-    }
-    writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2), "utf-8");
-  } catch (e) {
-    console.error("Cannot save settings (read-only filesystem?):", e);
-    throw new Error("Impossible de sauvegarder. Le système de fichiers est en lecture seule sur Vercel.");
+export async function saveSettings(settings: SiteSettings): Promise<void> {
+  // Try Redis first (Vercel)
+  const redis = getRedis();
+  if (redis) {
+    await redis.set(SETTINGS_KEY, settings);
+    return;
   }
+
+  // Fallback: file system (local dev)
+  const dir = path.dirname(SETTINGS_PATH);
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2), "utf-8");
 }

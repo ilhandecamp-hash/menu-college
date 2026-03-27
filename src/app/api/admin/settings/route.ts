@@ -14,7 +14,7 @@ export async function GET() {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  const settings = getSettings();
+  const settings = await getSettings();
   const themes = Object.values(colorThemes).map((t) => ({
     key: t.key,
     label: t.label,
@@ -46,9 +46,9 @@ export async function PUT(request: NextRequest) {
     }
   }
 
-  const current = getSettings();
+  const current = await getSettings();
   const updated: SiteSettings = { ...current, ...body };
-  saveSettings(updated);
+  await saveSettings(updated);
 
   return NextResponse.json({ settings: updated });
 }
