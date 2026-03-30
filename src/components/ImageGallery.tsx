@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface GalleryImage {
@@ -21,6 +21,7 @@ export default function ImageGallery({
   onClose,
 }: ImageGalleryProps) {
   const [current, setCurrent] = useState(initialIndex);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   const goNext = useCallback(() => {
     setCurrent((c) => (c + 1) % images.length);
@@ -36,23 +37,27 @@ export default function ImageGallery({
       if (e.key === "ArrowRight") goNext();
       if (e.key === "ArrowLeft") goPrev();
     };
-    // Scroll wheel closes the gallery
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      onClose();
-    };
-    // Block touch scroll on the overlay
-    const handleTouch = (e: TouchEvent) => {
-      e.preventDefault();
-    };
     document.addEventListener("keydown", handleKey);
-    document.addEventListener("wheel", handleWheel, { passive: false });
-    document.addEventListener("touchmove", handleTouch, { passive: false });
     document.body.style.overflow = "hidden";
+
+    // Capture wheel at the overlay element level
+    const overlay = overlayRef.current;
+    if (overlay) {
+      const handleWheel = (e: WheelEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      };
+      overlay.addEventListener("wheel", handleWheel, { passive: false });
+      return () => {
+        document.removeEventListener("keydown", handleKey);
+        overlay.removeEventListener("wheel", handleWheel);
+        document.body.style.overflow = "";
+      };
+    }
+
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.removeEventListener("wheel", handleWheel);
-      document.removeEventListener("touchmove", handleTouch);
       document.body.style.overflow = "";
     };
   }, [onClose, goNext, goPrev]);
@@ -63,25 +68,37 @@ export default function ImageGallery({
 
   return (
     <div
+      ref={overlayRef}
       className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
+      onTouchEnd={(e) => {
+        // Tap anywhere on overlay closes
+        if (e.target === overlayRef.current) onClose();
+      }}
+      style={{ touchAction: "none" }}
     >
-      {/* Close button — fixed to viewport */}
+      {/* Close button — big, always visible */}
       <button
-        onClick={onClose}
-        className="fixed right-3 top-3 z-[110] rounded-full bg-white/20 p-2.5 text-white transition-all duration-300 hover:bg-white/40 hover:scale-110 active:scale-95"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        className="fixed right-3 top-3 z-[110] flex items-center gap-2 rounded-full bg-white/25 px-4 py-2.5 text-white transition-all duration-300 hover:bg-white/40 hover:scale-105 active:scale-95"
         aria-label="Fermer"
       >
-        <X size={22} />
+        <X size={20} />
+        <span className="text-sm font-medium">Fermer</span>
       </button>
 
       {/* Counter */}
-      <div className="fixed top-3 left-1/2 z-[110] -translate-x-1/2 rounded-full bg-white/15 px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
-        {current + 1} / {images.length}
-      </div>
+      {hasThumbs && (
+        <div className="fixed top-3 left-1/2 z-[110] -translate-x-1/2 rounded-full bg-white/15 px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
+          {current + 1} / {images.length}
+        </div>
+      )}
 
       {/* Layout: full screen flex column */}
-      <div className="flex h-full w-full flex-col items-center justify-center px-12 py-16">
+      <div className="flex h-full w-full flex-col items-center justify-center px-14 py-16">
         {/* Main image area */}
         <div
           className="flex flex-1 items-center justify-center overflow-hidden"
