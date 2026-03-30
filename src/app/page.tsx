@@ -1,15 +1,18 @@
 import {
   CalendarDays,
+  Newspaper,
   RefreshCw,
   UtensilsCrossed,
   Settings,
 } from "lucide-react";
 import MenuList from "@/components/MenuList";
+import ArticleCard from "@/components/ArticleCard";
+import TabSwitcher from "@/components/TabSwitcher";
 import ScrollReveal from "@/components/ScrollReveal";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import PageViewTracker from "@/components/PageViewTracker";
 import { getSettings } from "@/lib/settings";
-import { scrapeMenus, MenuItem } from "@/lib/scraper";
+import { scrapeMenus, scrapeArticles, MenuItem } from "@/lib/scraper";
 
 export const dynamic = "force-dynamic";
 
@@ -81,12 +84,32 @@ function sortMenusByCurrentWeek(menus: MenuItem[]): MenuItem[] {
 export default async function Home() {
   const settings = await getSettings();
   let menus: MenuItem[] = [];
+  let articles: { title: string; url: string; date: string }[] = [];
+
   try {
-    menus = await scrapeMenus();
+    const [m, a] = await Promise.all([scrapeMenus(), scrapeArticles()]);
+    menus = m;
+    articles = a;
   } catch (e) {
-    console.error("Failed to scrape menus:", e);
+    console.error("Failed to scrape:", e);
   }
+
   const sortedMenus = sortMenusByCurrentWeek(menus);
+
+  const tabs = [
+    {
+      id: "menus",
+      label: "Menus de la semaine",
+      icon: <CalendarDays size={18} />,
+      count: sortedMenus.length,
+    },
+    {
+      id: "actus",
+      label: "Actualités Cantine",
+      icon: <Newspaper size={18} />,
+      count: articles.length,
+    },
+  ];
 
   return (
     <div className="relative min-h-screen overflow-hidden text-slate-800">
@@ -158,23 +181,43 @@ export default async function Home() {
           </ScrollReveal>
         </header>
 
-        {/* ===== MENUS ===== */}
+        {/* ===== TABS ===== */}
         <ScrollReveal delay={300}>
           <section className="mb-12">
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-sm bg-primary-gradient transition-transform duration-300 hover:scale-110 hover:rotate-3">
-                <CalendarDays size={20} />
+            <TabSwitcher tabs={tabs}>
+              {/* Tab 1: Menus */}
+              <div>
+                <MenuList
+                  menus={sortedMenus}
+                  downloadText={settings.downloadButtonText}
+                  emptyMessage={settings.emptyStateMessage}
+                />
               </div>
-              <h2 className="text-xl font-bold text-slate-800">
-                Menu de la semaine
-              </h2>
-            </div>
 
-            <MenuList
-              menus={sortedMenus}
-              downloadText={settings.downloadButtonText}
-              emptyMessage={settings.emptyStateMessage}
-            />
+              {/* Tab 2: Actualités */}
+              <div>
+                {articles.length === 0 ? (
+                  <div className="py-16 text-center">
+                    <Newspaper size={48} className="mx-auto mb-4 text-slate-300 animate-pulse-soft" />
+                    <p className="text-sm text-slate-400">
+                      Aucune actualité pour le moment.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {articles.map((article, i) => (
+                      <ArticleCard
+                        key={article.url}
+                        title={article.title}
+                        url={article.url}
+                        date={article.date}
+                        index={i}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabSwitcher>
           </section>
         </ScrollReveal>
 
