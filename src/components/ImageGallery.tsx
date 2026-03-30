@@ -117,7 +117,7 @@ export default function ImageGallery({
             src={images[current].fullSize}
             alt={images[current].alt}
             className="rounded-lg shadow-2xl"
-            style={{ maxWidth: "min(95vw, 1200px)" }}
+            style={{ maxWidth: "min(85vw, 900px)" }}
           />
         </div>
       </div>
