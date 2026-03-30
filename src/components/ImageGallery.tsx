@@ -24,12 +24,10 @@ export default function ImageGallery({
 
   const goNext = useCallback(() => {
     setCurrent((c) => (c + 1) % images.length);
-    window.scrollTo({ top: 0 });
   }, [images.length]);
 
   const goPrev = useCallback(() => {
     setCurrent((c) => (c - 1 + images.length) % images.length);
-    window.scrollTo({ top: 0 });
   }, [images.length]);
 
   useEffect(() => {
@@ -47,36 +45,64 @@ export default function ImageGallery({
   const hasThumbs = images.length > 1;
 
   return (
-    <>
-      {/* Fixed controls — always on screen */}
-      <div className="fixed inset-x-0 top-0 z-[120] flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent pointer-events-none">
-        {hasThumbs ? (
-          <span className="rounded-full bg-white/20 px-4 py-1.5 text-sm text-white pointer-events-auto">
-            {current + 1} / {images.length}
-          </span>
-        ) : (
-          <span />
-        )}
-        <button
-          onClick={onClose}
-          className="flex items-center gap-2 rounded-full bg-white/25 px-4 py-2 text-white transition-all hover:bg-white/40 active:scale-95 pointer-events-auto"
-        >
-          <X size={18} />
-          <span className="text-sm font-medium">Fermer</span>
-        </button>
-      </div>
+    <div
+      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      {/* Close button — top right */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-[130] flex items-center gap-2 rounded-full bg-white/25 px-4 py-2 text-white transition-all hover:bg-white/40 active:scale-95"
+      >
+        <X size={18} />
+        <span className="text-sm font-medium">Fermer</span>
+      </button>
 
-      {/* Fixed bottom bar */}
+      {/* Counter — top left */}
       {hasThumbs && (
-        <div className="fixed inset-x-0 bottom-0 z-[120] flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-t from-black/70 to-transparent pointer-events-none">
-          <button
-            onClick={goPrev}
-            className="rounded-full bg-white/20 p-2.5 text-white transition-all hover:bg-white/30 active:scale-95 pointer-events-auto"
-          >
-            <ChevronLeft size={22} />
-          </button>
+        <span className="absolute top-4 left-4 z-[130] rounded-full bg-white/20 px-4 py-1.5 text-sm text-white">
+          {current + 1} / {images.length}
+        </span>
+      )}
 
-          <div className="flex gap-2 rounded-xl bg-white/10 p-1.5 backdrop-blur-sm overflow-x-auto pointer-events-auto">
+      {/* Left arrow — side of image */}
+      {hasThumbs && (
+        <button
+          onClick={goPrev}
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-[130] rounded-full bg-white/20 p-3 text-white transition-all hover:bg-white/30 active:scale-95 sm:left-6"
+        >
+          <ChevronLeft size={24} />
+        </button>
+      )}
+
+      {/* Right arrow — side of image */}
+      {hasThumbs && (
+        <button
+          onClick={goNext}
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-[130] rounded-full bg-white/20 p-3 text-white transition-all hover:bg-white/30 active:scale-95 sm:right-6"
+        >
+          <ChevronRight size={24} />
+        </button>
+      )}
+
+      {/* Centered image + thumbnails */}
+      <div className="flex flex-col items-center gap-4 px-16 max-h-[92vh] overflow-y-auto">
+        <img
+          src={images[current].fullSize}
+          alt={images[current].alt}
+          className="rounded-lg shadow-2xl"
+          style={{
+            maxWidth: "min(75vw, 850px)",
+            maxHeight: "75vh",
+            objectFit: "contain",
+          }}
+        />
+
+        {/* Thumbnails row */}
+        {hasThumbs && (
+          <div className="flex gap-2 rounded-xl bg-white/10 p-1.5 backdrop-blur-sm overflow-x-auto flex-shrink-0">
             {images.map((img, i) => (
               <button
                 key={i}
@@ -95,32 +121,8 @@ export default function ImageGallery({
               </button>
             ))}
           </div>
-
-          <button
-            onClick={goNext}
-            className="rounded-full bg-white/20 p-2.5 text-white transition-all hover:bg-white/30 active:scale-95 pointer-events-auto"
-          >
-            <ChevronRight size={22} />
-          </button>
-        </div>
-      )}
-
-      {/* Scrollable overlay with image */}
-      <div
-        className="fixed inset-0 z-[110] overflow-y-auto bg-black/90 animate-fade-in"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
-      >
-        <div className="flex min-h-full items-start justify-center px-4 pt-16 pb-24">
-          <img
-            src={images[current].fullSize}
-            alt={images[current].alt}
-            className="rounded-lg shadow-2xl"
-            style={{ maxWidth: "min(85vw, 900px)" }}
-          />
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
