@@ -12,7 +12,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import PageViewTracker from "@/components/PageViewTracker";
 import { getSettings } from "@/lib/settings";
-import { scrapeMenus, scrapeArticles, MenuItem } from "@/lib/scraper";
+import { scrapeMenus, scrapeArticles, MenuItem, ArticleItem } from "@/lib/scraper";
 
 export const dynamic = "force-dynamic";
 
@@ -84,7 +84,7 @@ function sortMenusByCurrentWeek(menus: MenuItem[]): MenuItem[] {
 export default async function Home() {
   const settings = await getSettings();
   let menus: MenuItem[] = [];
-  let articles: { title: string; url: string; date: string }[] = [];
+  let articles: ArticleItem[] = [];
 
   try {
     const [m, a] = await Promise.all([scrapeMenus(), scrapeArticles()]);
@@ -211,6 +211,7 @@ export default async function Home() {
                         title={article.title}
                         url={article.url}
                         date={article.date}
+                        images={article.images}
                         index={i}
                       />
                     ))}
