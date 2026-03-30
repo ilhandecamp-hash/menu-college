@@ -46,89 +46,100 @@ export default function ImageGallery({
 
   if (images.length === 0) return null;
 
+  const hasThumbs = images.length > 1;
+
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
-      {/* Close button */}
+      {/* Close button — fixed to viewport */}
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white transition-all duration-300 hover:bg-white/20 hover:scale-110"
+        className="fixed right-3 top-3 z-[110] rounded-full bg-white/20 p-2.5 text-white transition-all duration-300 hover:bg-white/40 hover:scale-110 active:scale-95"
+        aria-label="Fermer"
       >
-        <X size={24} />
+        <X size={22} />
       </button>
 
       {/* Counter */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
+      <div className="fixed top-3 left-1/2 z-[110] -translate-x-1/2 rounded-full bg-white/15 px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
         {current + 1} / {images.length}
       </div>
 
-      {/* Navigation arrows */}
-      {images.length > 1 && (
+      {/* Layout: full screen flex column */}
+      <div className="flex h-full w-full flex-col items-center justify-center px-12 py-16">
+        {/* Main image area */}
+        <div
+          className="flex flex-1 items-center justify-center overflow-hidden"
+          style={{ maxHeight: hasThumbs ? "calc(100% - 80px)" : "100%" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <img
+            src={images[current].fullSize}
+            alt={images[current].alt}
+            className="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
+          />
+        </div>
+
+        {/* Caption */}
+        {images[current].alt && (
+          <p className="mt-2 text-center text-sm text-white/60">
+            {images[current].alt}
+          </p>
+        )}
+
+        {/* Thumbnail strip */}
+        {hasThumbs && (
+          <div
+            className="mt-3 flex gap-2 rounded-xl bg-white/10 p-2 backdrop-blur-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {images.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg transition-all duration-300 ${
+                  i === current
+                    ? "ring-2 ring-white scale-110"
+                    : "opacity-50 hover:opacity-80"
+                }`}
+              >
+                <img
+                  src={img.thumbnail}
+                  alt={img.alt}
+                  className="h-full w-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Navigation arrows — fixed to viewport */}
+      {hasThumbs && (
         <>
           <button
             onClick={(e) => {
               e.stopPropagation();
               goPrev();
             }}
-            className="absolute left-4 z-10 rounded-full bg-white/10 p-3 text-white transition-all duration-300 hover:bg-white/20 hover:scale-110"
+            className="fixed left-3 top-1/2 z-[110] -translate-y-1/2 rounded-full bg-white/15 p-3 text-white transition-all duration-300 hover:bg-white/30 hover:scale-110 active:scale-95"
+            aria-label="Précédent"
           >
-            <ChevronLeft size={28} />
+            <ChevronLeft size={26} />
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               goNext();
             }}
-            className="absolute right-4 z-10 rounded-full bg-white/10 p-3 text-white transition-all duration-300 hover:bg-white/20 hover:scale-110"
+            className="fixed right-3 top-1/2 z-[110] -translate-y-1/2 rounded-full bg-white/15 p-3 text-white transition-all duration-300 hover:bg-white/30 hover:scale-110 active:scale-95"
+            aria-label="Suivant"
           >
-            <ChevronRight size={28} />
+            <ChevronRight size={26} />
           </button>
         </>
-      )}
-
-      {/* Main image */}
-      <div
-        className="max-h-[85vh] max-w-[90vw]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <img
-          src={images[current].fullSize}
-          alt={images[current].alt}
-          className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain shadow-2xl transition-opacity duration-300"
-        />
-        {images[current].alt && (
-          <p className="mt-3 text-center text-sm text-white/70">
-            {images[current].alt}
-          </p>
-        )}
-      </div>
-
-      {/* Thumbnail strip */}
-      {images.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 rounded-xl bg-white/10 p-2 backdrop-blur-sm">
-          {images.map((img, i) => (
-            <button
-              key={i}
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrent(i);
-              }}
-              className={`h-12 w-12 overflow-hidden rounded-lg transition-all duration-300 ${
-                i === current
-                  ? "ring-2 ring-white scale-110"
-                  : "opacity-50 hover:opacity-80"
-              }`}
-            >
-              <img
-                src={img.thumbnail}
-                alt={img.alt}
-                className="h-full w-full object-cover"
-              />
-            </button>
-          ))}
-        </div>
       )}
     </div>
   );

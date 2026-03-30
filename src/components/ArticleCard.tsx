@@ -74,7 +74,7 @@ export default function ArticleCard({
             className="relative block w-full overflow-hidden cursor-pointer"
           >
             <img
-              src={images[0].thumbnail}
+              src={images[0].fullSize}
               alt={images[0].alt || title}
               className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
