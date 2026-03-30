@@ -20,17 +20,40 @@ const MOIS: Record<string, number> = {
 };
 
 function parseDateRange(title: string): { start: Date; end: Date } | null {
-  const match = title
-    .toLowerCase()
-    .match(/(\d{1,2})\s*au\s*(\d{1,2})\s+([a-zéûô]+)\s+(\d{4})/);
-  if (!match) return null;
-  const [, startDay, endDay, month, year] = match;
-  const m = MOIS[month];
-  if (m === undefined) return null;
-  return {
-    start: new Date(+year, m, +startDay),
-    end: new Date(+year, m, +endDay, 23, 59, 59),
-  };
+  const lower = title.toLowerCase();
+
+  // Format: "30 mars au 03 avril 2026" (cross-month)
+  const cross = lower.match(
+    /(\d{1,2})\s+([a-zéûô]+)\s+au\s+(\d{1,2})\s+([a-zéûô]+)\s+(\d{4})/
+  );
+  if (cross) {
+    const [, startDay, startMonth, endDay, endMonth, year] = cross;
+    const sm = MOIS[startMonth];
+    const em = MOIS[endMonth];
+    if (sm !== undefined && em !== undefined) {
+      return {
+        start: new Date(+year, sm, +startDay),
+        end: new Date(+year, em, +endDay, 23, 59, 59),
+      };
+    }
+  }
+
+  // Format: "23 au 27 mars 2026" (same month)
+  const same = lower.match(
+    /(\d{1,2})\s*au\s*(\d{1,2})\s+([a-zéûô]+)\s+(\d{4})/
+  );
+  if (same) {
+    const [, startDay, endDay, month, year] = same;
+    const m = MOIS[month];
+    if (m !== undefined) {
+      return {
+        start: new Date(+year, m, +startDay),
+        end: new Date(+year, m, +endDay, 23, 59, 59),
+      };
+    }
+  }
+
+  return null;
 }
 
 function sortMenusByCurrentWeek(menus: MenuItem[]): MenuItem[] {
