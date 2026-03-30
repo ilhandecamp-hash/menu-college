@@ -36,10 +36,23 @@ export default function ImageGallery({
       if (e.key === "ArrowRight") goNext();
       if (e.key === "ArrowLeft") goPrev();
     };
+    // Scroll wheel closes the gallery
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      onClose();
+    };
+    // Block touch scroll on the overlay
+    const handleTouch = (e: TouchEvent) => {
+      e.preventDefault();
+    };
     document.addEventListener("keydown", handleKey);
+    document.addEventListener("wheel", handleWheel, { passive: false });
+    document.addEventListener("touchmove", handleTouch, { passive: false });
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", handleKey);
+      document.removeEventListener("wheel", handleWheel);
+      document.removeEventListener("touchmove", handleTouch);
       document.body.style.overflow = "";
     };
   }, [onClose, goNext, goPrev]);
