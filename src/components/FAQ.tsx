@@ -5,7 +5,6 @@ import {
   ChevronDown,
   Euro,
   Clock,
-  Bus,
   Phone,
   Mail,
   MapPin,
@@ -39,26 +38,31 @@ const faqItems: FAQItem[] = [
   },
   {
     icon: <UtensilsCrossed size={18} />,
-    question: "Quels sont les régimes de demi-pension ?",
+    question: "Quels sont les régimes de présence ?",
     answer: (
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         <li>
-          <strong>Externe :</strong> l'élève mange chez lui, il arrive et repart
-          selon son emploi du temps.
+          <strong>Régime n°1 :</strong> L'élève est présent de 8h30 à 17h00 quel
+          que soit son emploi du temps et mange à la cantine.
         </li>
         <li>
-          <strong>Demi-pensionnaire libre (DP libre) :</strong> l'élève doit
-          manger au collège, mais peut partir après le repas s'il n'a pas cours
-          l'après-midi.
+          <strong>Régime n°2 :</strong> L'élève suit son emploi du temps
+          habituel (distribué à la rentrée). Sortie possible après le repas à
+          partir de 13h00 pour les demi-pensionnaires. En cas d'absence de
+          professeur, il ne peut pas sortir plus tôt seul — un parent doit
+          signer le cahier de décharge à l'accueil.
         </li>
         <li>
-          <strong>Demi-pensionnaire car (DP car) :</strong> l'élève arrive et
-          repart avec le bus scolaire et ne peut pas quitter le collège (sauf
-          autorisation écrite des parents).
+          <strong>Régime n°3 :</strong> L'élève suit son emploi du temps réel
+          (avec modifications). Sortie possible à partir de 13h00 après le repas
+          pour les demi-pensionnaires, y compris en cas d'absence de professeur,
+          sans information préalable de la famille.
         </li>
         <li>
-          <strong>Présence obligatoire :</strong> l'élève doit arriver à 8h30 et
-          repartir à 17h00, aucune sortie autorisée.
+          <strong>Externe :</strong> L'élève ne mange pas à la cantine. Il
+          arrive à sa première heure de cours et repart à la fin de sa dernière
+          heure de chaque demi-journée. Autorisé à sortir en cas d'absence de
+          professeur sans information préalable de la famille.
         </li>
       </ul>
     ),
@@ -77,18 +81,6 @@ const faqItems: FAQItem[] = [
           d'avoir pris son repas, même en cas d'après-midi libérée.
         </p>
       </>
-    ),
-  },
-  {
-    icon: <Bus size={18} />,
-    question: "Comment fonctionne le transport scolaire ?",
-    answer: (
-      <p>
-        Les élèves en régime <strong>DP car</strong> arrivent et repartent avec
-        le bus scolaire. Ils ne peuvent quitter le collège qu'avec une
-        autorisation exceptionnelle signée par les parents à l'accueil ou dans
-        le carnet de correspondance.
-      </p>
     ),
   },
   {
