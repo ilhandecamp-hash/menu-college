@@ -19,6 +19,10 @@ import {
   TrendingUp,
   Users,
   Globe,
+  HelpCircle,
+  Plus,
+  Trash2,
+  GripVertical,
 } from "lucide-react";
 
 interface SiteSettings {
@@ -38,6 +42,7 @@ interface SiteSettings {
   siteUrl: string;
   language: string;
   authorText: string;
+  faqItems: { question: string; answer: string }[];
 }
 
 interface ThemeOption {
@@ -495,6 +500,106 @@ export default function AdminPage() {
                   </p>
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* ===== FAQ ===== */}
+          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                  <HelpCircle size={18} />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-slate-900">
+                    FAQ / Infos Pratiques
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Questions fréquentes affichées dans l&apos;onglet &quot;Infos Pratiques&quot;
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  const items = [...(settings.faqItems || [])];
+                  items.push({ question: "", answer: "" });
+                  updateSetting("faqItems", items);
+                }}
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
+              >
+                <Plus size={14} />
+                Ajouter
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {(settings.faqItems || []).map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                      <GripVertical size={14} />
+                      Question {i + 1}
+                    </div>
+                    <button
+                      onClick={() => {
+                        const items = [...(settings.faqItems || [])];
+                        items.splice(i, 1);
+                        updateSetting("faqItems", items);
+                      }}
+                      className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-red-500 transition-colors hover:bg-red-50"
+                    >
+                      <Trash2 size={12} />
+                      Supprimer
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                        Question
+                      </label>
+                      <input
+                        type="text"
+                        value={item.question}
+                        onChange={(e) => {
+                          const items = [...(settings.faqItems || [])];
+                          items[i] = { ...items[i], question: e.target.value };
+                          updateSetting("faqItems", items);
+                        }}
+                        placeholder="Ex: Quel est le prix d'un repas ?"
+                        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                        Réponse
+                      </label>
+                      <textarea
+                        value={item.answer}
+                        onChange={(e) => {
+                          const items = [...(settings.faqItems || [])];
+                          items[i] = { ...items[i], answer: e.target.value };
+                          updateSetting("faqItems", items);
+                        }}
+                        rows={4}
+                        placeholder={"Écrivez la réponse ici...\n\nFormatage :\n**texte en gras**\n[lien](https://...)\n- élément de liste"}
+                        className="w-full resize-none rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 font-mono"
+                      />
+                      <p className="mt-1 text-[11px] text-slate-400">
+                        **gras** • [texte](url) pour un lien • ligne commençant par &quot;- &quot; pour une liste • ligne vide pour un nouveau paragraphe
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {(!settings.faqItems || settings.faqItems.length === 0) && (
+                <div className="py-8 text-center text-sm text-slate-400">
+                  Aucune question. Cliquez sur &quot;Ajouter&quot; pour créer votre première question.
+                </div>
+              )}
             </div>
           </section>
 

@@ -228,7 +228,7 @@ export default async function Home() {
 
               {/* Tab 3: FAQ */}
               <div>
-                <FAQ />
+                <FAQ items={settings.faqItems ?? []} />
               </div>
             </TabSwitcher>
           </section>

@@ -23,6 +23,7 @@ export interface SiteSettings {
   siteUrl: string;
   language: string;
   authorText: string;
+  faqItems: { question: string; answer: string }[];
 }
 
 export const defaultSettings: SiteSettings = {
@@ -46,6 +47,33 @@ export const defaultSettings: SiteSettings = {
   siteUrl: "",
   language: "fr",
   authorText: "Fait par DECAMP Ilhan 6G",
+  faqItems: [
+    {
+      question: "Quel est le prix d'un repas à la cantine ?",
+      answer:
+        "Depuis le **1er janvier 2025**, le prix d'un repas est de **3,70 €** par repas.\n\nCe tarif est fixé par le Conseil Départemental du Loiret pour tous les collèges du département. Le coût réel d'un repas est d'environ 8 € — le Département prend en charge environ 60 % du coût.",
+    },
+    {
+      question: "Quels sont les régimes de présence ?",
+      answer:
+        "- **Régime n°1 :** L'élève est présent de 8h30 à 17h00 quel que soit son emploi du temps et mange à la cantine.\n- **Régime n°2 :** L'élève suit son emploi du temps habituel (distribué à la rentrée). Sortie possible après le repas à partir de 13h00 pour les demi-pensionnaires. En cas d'absence de professeur, il ne peut pas sortir plus tôt seul — un parent doit signer le cahier de décharge à l'accueil.\n- **Régime n°3 :** L'élève suit son emploi du temps réel (avec modifications). Sortie possible à partir de 13h00 après le repas pour les demi-pensionnaires, y compris en cas d'absence de professeur, sans information préalable de la famille.\n- **Externe :** L'élève ne mange pas à la cantine. Il arrive à sa première heure de cours et repart à la fin de sa dernière heure de chaque demi-journée. Autorisé à sortir en cas d'absence de professeur sans information préalable de la famille.",
+    },
+    {
+      question: "Quels sont les horaires du collège ?",
+      answer:
+        "Les horaires généraux du collège sont de **8h30** à **17h00**.\n\nUn élève demi-pensionnaire ne peut pas quitter le collège avant d'avoir pris son repas, même en cas d'après-midi libérée.",
+    },
+    {
+      question: "Où trouver le règlement de la demi-pension ?",
+      answer:
+        "Le règlement intérieur du service de demi-pension est disponible sur le [site officiel du collège](https://clg-rschuman-amilly.tice.ac-orleans-tours.fr/eva/spip.php?rubrique164), dans la rubrique « Règlements ».",
+    },
+    {
+      question: "Comment contacter le collège ?",
+      answer:
+        "- **Téléphone :** 02 38 28 11 53\n- **Email :** ce.0450937z@ac-orleans-tours.fr\n- **Adresse :** 307 route de Viroy, 45200 Amilly",
+    },
+  ],
 };
 
 // --- Color Themes ---
