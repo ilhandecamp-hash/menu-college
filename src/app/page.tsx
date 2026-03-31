@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  HelpCircle,
   Newspaper,
   RefreshCw,
   UtensilsCrossed,
@@ -7,6 +8,7 @@ import {
 } from "lucide-react";
 import MenuList from "@/components/MenuList";
 import ArticleCard from "@/components/ArticleCard";
+import FAQ from "@/components/FAQ";
 import TabSwitcher from "@/components/TabSwitcher";
 import ScrollReveal from "@/components/ScrollReveal";
 import DarkModeToggle from "@/components/DarkModeToggle";
@@ -108,6 +110,11 @@ export default async function Home() {
       label: "Actualités Cantine",
       icon: <Newspaper size={18} />,
       count: articles.length,
+    },
+    {
+      id: "faq",
+      label: "Infos Pratiques",
+      icon: <HelpCircle size={18} />,
     },
   ];
 
@@ -217,6 +224,11 @@ export default async function Home() {
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Tab 3: FAQ */}
+              <div>
+                <FAQ />
               </div>
             </TabSwitcher>
           </section>
