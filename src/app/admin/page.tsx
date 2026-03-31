@@ -37,6 +37,7 @@ interface SiteSettings {
   ogImageUrl: string;
   siteUrl: string;
   language: string;
+  authorText: string;
 }
 
 interface ThemeOption {
@@ -408,6 +409,11 @@ export default function AdminPage() {
                 label="Texte du footer"
                 value={settings.footerText}
                 onChange={(v) => updateSetting("footerText", v)}
+              />
+              <Field
+                label="Crédit / Auteur (affiché en bas du site)"
+                value={settings.authorText}
+                onChange={(v) => updateSetting("authorText", v)}
               />
             </div>
           </section>

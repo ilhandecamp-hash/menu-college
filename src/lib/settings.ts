@@ -22,6 +22,7 @@ export interface SiteSettings {
   ogImageUrl: string;
   siteUrl: string;
   language: string;
+  authorText: string;
 }
 
 export const defaultSettings: SiteSettings = {
@@ -44,6 +45,7 @@ export const defaultSettings: SiteSettings = {
   ogImageUrl: "",
   siteUrl: "",
   language: "fr",
+  authorText: "Fait par DECAMP Ilhan 6G",
 };
 
 // --- Color Themes ---

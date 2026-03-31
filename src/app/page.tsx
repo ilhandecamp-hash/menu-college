@@ -251,6 +251,11 @@ export default async function Home() {
                 {settings.sourceLabel}
               </a>
             </p>
+            {settings.authorText && (
+              <p className="mt-2 font-medium text-slate-500">
+                {settings.authorText}
+              </p>
+            )}
           </footer>
         </ScrollReveal>
       </div>
