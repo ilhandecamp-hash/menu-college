@@ -22,6 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: "/",
     },
+    icons: {
+      icon: "/logo.png",
+      apple: "/logo.png",
+    },
     openGraph: {
       type: "website",
       locale: settings.language === "en" ? "en_US" : "fr_FR",

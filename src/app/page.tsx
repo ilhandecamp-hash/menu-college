@@ -161,6 +161,14 @@ export default async function Home() {
         {/* Header */}
         <header className="mb-12 text-center">
           <ScrollReveal direction="scale" delay={0}>
+            <img
+              src="/logo.png"
+              alt={`Logo ${settings.schoolName}`}
+              className="mx-auto mb-5 h-24 w-auto drop-shadow-md transition-transform duration-300 hover:scale-105 sm:h-28"
+            />
+          </ScrollReveal>
+
+          <ScrollReveal direction="scale" delay={50}>
             <div
               className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/80 px-5 py-2 text-sm font-semibold shadow-sm backdrop-blur-sm transition-transform duration-300 hover:scale-105"
               style={{
